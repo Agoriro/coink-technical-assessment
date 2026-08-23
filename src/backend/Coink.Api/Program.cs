@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using Coink.Api.Configuration;
+using Coink.Api.Endpoints;
 using Coink.Api.ErrorHandling;
 using Coink.Api.Middleware;
 using Coink.Application;
@@ -79,6 +80,8 @@ if (app.Environment.IsDevelopment())
         options.RoutePrefix = "swagger";
     });
 }
+
+app.MapGeographyEndpoints();
 
 app.Run();
 

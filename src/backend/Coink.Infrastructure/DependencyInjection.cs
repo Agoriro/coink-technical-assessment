@@ -1,3 +1,6 @@
+using Coink.Application.Geography;
+using Coink.Infrastructure.Geography;
+using Dapper;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Npgsql;
@@ -34,7 +37,11 @@ public static class DependencyInjection
                 $"Connection string '{PostgresConnectionName}' is required.");
         }
 
+        // Stored Procedure result columns use SQL snake_case; configure mapping before any
+        // scoped repository can materialize its private database rows.
+        DefaultTypeMap.MatchNamesWithUnderscores = true;
         _ = services.AddSingleton(_ => NpgsqlDataSource.Create(connectionString));
+        _ = services.AddScoped<IGeographyRepository, GeographyRepository>();
 
         return services;
     }

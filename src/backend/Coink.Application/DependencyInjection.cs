@@ -1,3 +1,4 @@
+using Coink.Application.Geography;
 using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -20,6 +21,7 @@ public static class DependencyInjection
         _ = services.AddValidatorsFromAssembly(
             typeof(DependencyInjection).Assembly,
             includeInternalTypes: true);
+        _ = services.AddScoped<IGeographyService, GeographyService>();
 
         return services;
     }
