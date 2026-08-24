@@ -1,0 +1,292 @@
+{
+  "info": {
+    "_postman_id": "fd87c76c-25f2-44e7-b0e9-c0139b52c312",
+    "name": "COINK User Registration API",
+    "description": "Reviewer requests for the COINK assessment. Select the COINK Local environment and run against the Docker Compose stack. No authentication is part of the approved scope.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Geography",
+      "item": [
+        {
+          "name": "List countries",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/countries",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "countries"]
+            },
+            "description": "Returns the read-only country catalog in deterministic order."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Catalog has Colombia', () => {",
+                  "  const countries = pm.response.json();",
+                  "  pm.expect(countries.some((country) => country.id === 170)).to.be.true;",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "List departments",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/countries/{{countryId}}/departments",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "countries", "{{countryId}}", "departments"]
+            },
+            "description": "Returns departments belonging to countryId."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "List municipalities",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/departments/{{departmentId}}/municipalities",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "departments",
+                "{{departmentId}}",
+                "municipalities"
+              ]
+            },
+            "description": "Returns municipality-level units belonging to departmentId."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Users",
+      "item": [
+        {
+          "name": "Create user",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Postman Reviewer\",\n  \"phone\": \"+573001234567\",\n  \"countryId\": {{countryId}},\n  \"departmentId\": {{departmentId}},\n  \"municipalityId\": {{municipalityId}},\n  \"address\": \"Calle 10 # 20-30\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/users",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "users"]
+            },
+            "description": "Registers a user and stores the returned id for later requests."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 201', () => pm.response.to.have.status(201));",
+                  "pm.test('Location is present', () => pm.expect(pm.response.headers.get('Location')).to.exist);",
+                  "if (pm.response.code === 201) {",
+                  "  pm.environment.set('userId', String(pm.response.json().id));",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "List users",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/users?page=1&pageSize=20&search=Postman",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "users"],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "pageSize", "value": "20" },
+                { "key": "search", "value": "Postman" }
+              ]
+            },
+            "description": "Lists a bounded page with optional literal name/phone search."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Page metadata exists', () => pm.expect(pm.response.json()).to.include.keys('items', 'page', 'pageSize', 'totalCount', 'totalPages'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get user",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/users/{{userId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "users", "{{userId}}"]
+            },
+            "description": "Gets the user captured by Create user."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Update user",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Postman Reviewer Updated\",\n  \"phone\": \"+573001234568\",\n  \"countryId\": {{countryId}},\n  \"departmentId\": {{departmentId}},\n  \"municipalityId\": {{municipalityId}},\n  \"address\": \"Carrera 20 # 30-40\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/users/{{userId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "users", "{{userId}}"]
+            },
+            "description": "Replaces all editable fields of the captured user."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Invalid geographic hierarchy",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Invalid Geography\",\n  \"phone\": \"3001234567\",\n  \"countryId\": {{countryId}},\n  \"departmentId\": 8,\n  \"municipalityId\": {{municipalityId}},\n  \"address\": \"Calle 1\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/users",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "users"]
+            },
+            "description": "Demonstrates authoritative rejection when Medellín is paired with Atlántico."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 400', () => pm.response.to.have.status(400));",
+                  "pm.test('Stable hierarchy code', () => pm.expect(pm.response.json().code).to.eql('geography.invalid_hierarchy'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Delete user",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/users/{{userId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "users", "{{userId}}"]
+            },
+            "description": "Permanently deletes the captured user."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 204', () => pm.response.to.have.status(204));",
+                  "if (pm.response.code === 204) { pm.environment.unset('userId'); }"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:8080" },
+    { "key": "countryId", "value": "170" },
+    { "key": "departmentId", "value": "5" },
+    { "key": "municipalityId", "value": "5001" },
+    { "key": "userId", "value": "" }
+  ]
+}
