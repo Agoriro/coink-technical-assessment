@@ -82,6 +82,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.MapGeographyEndpoints();
+app.MapUserEndpoints();
 
 app.Run();
 

@@ -1,4 +1,5 @@
 using Coink.Application.Geography;
+using Coink.Application.Users;
 using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -22,6 +23,7 @@ public static class DependencyInjection
             typeof(DependencyInjection).Assembly,
             includeInternalTypes: true);
         _ = services.AddScoped<IGeographyService, GeographyService>();
+        _ = services.AddScoped<IUserService, UserService>();
 
         return services;
     }

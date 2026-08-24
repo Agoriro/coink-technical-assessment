@@ -1,5 +1,8 @@
 using Coink.Application.Geography;
+using Coink.Application.Users;
+using Coink.Infrastructure.Database;
 using Coink.Infrastructure.Geography;
+using Coink.Infrastructure.Users;
 using Dapper;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -41,7 +44,9 @@ public static class DependencyInjection
         // scoped repository can materialize its private database rows.
         DefaultTypeMap.MatchNamesWithUnderscores = true;
         _ = services.AddSingleton(_ => NpgsqlDataSource.Create(connectionString));
+        _ = services.AddSingleton<RefCursorExecutor>();
         _ = services.AddScoped<IGeographyRepository, GeographyRepository>();
+        _ = services.AddScoped<IUserRepository, UserRepository>();
 
         return services;
     }

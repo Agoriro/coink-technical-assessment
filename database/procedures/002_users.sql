@@ -90,7 +90,8 @@ $$;
 
 -- Purpose: Return a bounded, searchable page of users plus the filtered total count.
 -- Parameters: p_page is one-based, p_page_size is 1..100, and blank p_search means no filter.
--- Result: user columns plus total_count repeated per returned row; an empty page has no rows.
+-- Result: user columns plus total_count repeated per returned row. An empty page returns one
+-- metadata row with nullable user columns so callers still receive the filtered total count.
 -- Validation/errors: invalid pagination raises SQLSTATE 22023; search is literal and case-insensitive.
 -- Concurrency/order: offset pagination observes one snapshot and orders by lower(name), then id.
 create or replace procedure app.list_users(
@@ -115,25 +116,57 @@ begin
     end if;
 
     open p_result for
+        with filtered_users as (
+            select
+                app_user.id,
+                app_user.name,
+                app_user.phone,
+                app_user.country_id,
+                app_user.department_id,
+                app_user.municipality_id,
+                app_user.address,
+                app_user.created_at,
+                app_user.updated_at
+            from app.users as app_user
+            where p_search is null
+                or btrim(p_search) = ''
+                or position(lower(btrim(p_search)) in lower(app_user.name)) > 0
+                or position(lower(btrim(p_search)) in lower(app_user.phone)) > 0
+        ),
+        paged_users as (
+            select
+                filtered_user.id,
+                filtered_user.name,
+                filtered_user.phone,
+                filtered_user.country_id,
+                filtered_user.department_id,
+                filtered_user.municipality_id,
+                filtered_user.address,
+                filtered_user.created_at,
+                filtered_user.updated_at
+            from filtered_users as filtered_user
+            order by lower(filtered_user.name), filtered_user.id
+            limit p_page_size
+            offset ((p_page::bigint - 1) * p_page_size::bigint)
+        ),
+        filtered_count as (
+            select count(*) as total_count
+            from filtered_users
+        )
         select
-            app_user.id,
-            app_user.name,
-            app_user.phone,
-            app_user.country_id,
-            app_user.department_id,
-            app_user.municipality_id,
-            app_user.address,
-            app_user.created_at,
-            app_user.updated_at,
-            count(*) over () as total_count
-        from app.users as app_user
-        where p_search is null
-            or btrim(p_search) = ''
-            or position(lower(btrim(p_search)) in lower(app_user.name)) > 0
-            or position(lower(btrim(p_search)) in lower(app_user.phone)) > 0
-        order by lower(app_user.name), app_user.id
-        limit p_page_size
-        offset ((p_page::bigint - 1) * p_page_size::bigint);
+            paged_user.id,
+            paged_user.name,
+            paged_user.phone,
+            paged_user.country_id,
+            paged_user.department_id,
+            paged_user.municipality_id,
+            paged_user.address,
+            paged_user.created_at,
+            paged_user.updated_at,
+            filtered_count.total_count
+        from filtered_count
+        left join paged_users as paged_user on true
+        order by lower(paged_user.name), paged_user.id;
 end;
 $$;
 

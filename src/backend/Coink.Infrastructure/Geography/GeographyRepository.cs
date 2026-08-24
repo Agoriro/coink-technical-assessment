@@ -1,10 +1,10 @@
 using Coink.Application.Geography;
-using Dapper;
+using Coink.Infrastructure.Database;
 using Npgsql;
 
 namespace Coink.Infrastructure.Geography;
 
-internal sealed class GeographyRepository(NpgsqlDataSource dataSource) : IGeographyRepository
+internal sealed class GeographyRepository(RefCursorExecutor cursorExecutor) : IGeographyRepository
 {
     private const string NoDataFoundSqlState = "P0002";
     private const string GetCountriesCall = "call app.get_countries('api_countries');";
@@ -19,7 +19,7 @@ internal sealed class GeographyRepository(NpgsqlDataSource dataSource) : IGeogra
     public async Task<IReadOnlyList<CountryReference>> GetCountriesAsync(
         CancellationToken cancellationToken)
     {
-        IReadOnlyList<CountryRow> rows = await QueryCursorAsync<CountryRow>(
+        IReadOnlyList<CountryRow> rows = await cursorExecutor.QueryAsync<CountryRow>(
             GetCountriesCall,
             FetchCountries,
             parameters: null,
@@ -41,7 +41,7 @@ internal sealed class GeographyRepository(NpgsqlDataSource dataSource) : IGeogra
     {
         try
         {
-            IReadOnlyList<DepartmentRow> rows = await QueryCursorAsync<DepartmentRow>(
+            IReadOnlyList<DepartmentRow> rows = await cursorExecutor.QueryAsync<DepartmentRow>(
                 GetDepartmentsCall,
                 FetchDepartments,
                 new { CountryId = countryId },
@@ -68,7 +68,7 @@ internal sealed class GeographyRepository(NpgsqlDataSource dataSource) : IGeogra
     {
         try
         {
-            IReadOnlyList<MunicipalityRow> rows = await QueryCursorAsync<MunicipalityRow>(
+            IReadOnlyList<MunicipalityRow> rows = await cursorExecutor.QueryAsync<MunicipalityRow>(
                 GetMunicipalitiesCall,
                 FetchMunicipalities,
                 new { DepartmentId = departmentId },
@@ -88,35 +88,6 @@ internal sealed class GeographyRepository(NpgsqlDataSource dataSource) : IGeogra
         {
             return null;
         }
-    }
-
-    private async Task<IReadOnlyList<T>> QueryCursorAsync<T>(
-        string callCommandText,
-        string fetchCommandText,
-        object? parameters,
-        CancellationToken cancellationToken)
-    {
-        await using NpgsqlConnection connection = await dataSource.OpenConnectionAsync(
-            cancellationToken);
-        await using NpgsqlTransaction transaction = await connection.BeginTransactionAsync(
-            cancellationToken);
-
-        CommandDefinition callCommand = new(
-            callCommandText,
-            parameters,
-            transaction,
-            cancellationToken: cancellationToken);
-        _ = await connection.ExecuteAsync(callCommand);
-
-        CommandDefinition fetchCommand = new(
-            fetchCommandText,
-            transaction: transaction,
-            cancellationToken: cancellationToken);
-        IEnumerable<T> result = await connection.QueryAsync<T>(fetchCommand);
-        List<T> rows = [.. result];
-
-        await transaction.CommitAsync(cancellationToken);
-        return rows;
     }
 
     private sealed record CountryRow(
