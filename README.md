@@ -71,5 +71,24 @@ API ports. Playwright uses one worker for deterministic shared-database flows
 and keeps traces, screenshots, and videos only as configured for failure
 diagnosis; generated reports are ignored by Git.
 
+## Continuous integration
+
+GitHub Actions runs on pushes and pull requests targeting `develop` or `main`,
+and can also be started manually. The workflow enforces three ordered quality
+gates:
+
+- .NET restore, formatting, release build, unit tests, and integration tests
+  against an ephemeral real PostgreSQL instance;
+- deterministic frontend install, formatting, lint, strict type checking, unit
+  and component tests, and a production build;
+- complete Docker Compose image build/start followed by the Playwright Chromium
+  journeys.
+
+The E2E gate uses the required Playwright browser/system-dependency installation,
+generates a masked disposable database credential, runs with one worker, uploads
+reports and failure evidence for seven days, and always removes its disposable
+containers and database volume. This workflow is validation-only; automated
+deployment is intentionally outside the assessment scope.
+
 Expanded architecture, API, testing, troubleshooting, decision, and compliance
 documentation will be consolidated in the final documentation phase.

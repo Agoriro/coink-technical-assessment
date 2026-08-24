@@ -1,9 +1,9 @@
 # Project State
 
 - Current branch: `develop`
-- Last completed phase: Phase 8 - automated test pyramid
-- Current status: awaiting explicit approval for Phase 9
-- Next phase: CI/CD quality validation
+- Last completed phase: Phase 9 - GitHub Actions CI validation
+- Current status: awaiting explicit approval for Phase 10
+- Next phase: final documentation, reviewer assets, and compliance/security review
 - Assessment source: the supplied PDF/Markdown confirms the registration, relational geography, Stored Procedure, error-handling, Docker, and OpenAPI requirements
 - Data source: fixed 1,119-row DIVIPOLA snapshot supplied as `subregiones.pdf`; provenance, checksum, deterministic generation, and catalog-version caveat are documented in `database/seed/README.md`
 - Environment note: the in-app browser remains unavailable, but Playwright-managed Chromium now passes the complete reviewer journeys headlessly
@@ -20,6 +20,7 @@
 - Phase 6: responsive Next.js user directory with search/pagination, create/detail/edit/delete journeys, dependent Colombia selectors, accessible states, and layered API clients
 - Phase 7: digest-pinned multi-stage images, non-root API/web runtimes, deterministic database initialization, health-gated Compose startup, local-only ports, and explicit persistent/reset workflows
 - Phase 8: backend unit tests, real-PostgreSQL API/database integration tests, frontend unit/component tests, and Playwright reviewer journeys
+- Phase 9: GitHub Actions gates for backend/PostgreSQL, frontend, Docker Compose, and Playwright E2E validation
 
 ## Phase 2 validation evidence
 
@@ -84,6 +85,15 @@
 - Deterministic `npm ci`, strict frontend/E2E type checking, ESLint, Prettier, Next.js production build, .NET formatting, and package audits pass.
 - The E2E stack used alternate loopback web/PostgreSQL ports; its containers, network, database volume, browser test users, and Testcontainers resources were removed after validation.
 
+## Phase 9 validation evidence
+
+- `actionlint` 1.7.12 and Prettier validate the GitHub Actions workflow; official action majors are pinned and workflow permissions are read-only.
+- The backend gate restores and formats the solution, builds Release with zero warnings/errors, and records 8 unit plus 8 real-PostgreSQL integration tests in separate TRX artifacts without skipped tests or result collisions.
+- The frontend gate completes deterministic installation, formatting, ESLint, strict TypeScript, 6 Vitest tests, and the optimized Next.js production build.
+- The E2E gate uses the mandatory Playwright installation sequence, generates a masked disposable database credential, builds and health-checks all three Compose services, and passes all 3 Chromium journeys with one worker.
+- Local CI simulation caught and corrected an origin/CORS mismatch before commit; the final `localhost` configuration passes, and all temporary Compose containers, network, and database volume were removed.
+- The workflow validates pushes and pull requests for `develop`/`main` plus manual runs; deployment remains explicitly out of scope.
+
 ## Approval boundary
 
-Do not begin Phase 9 until the user explicitly approves it.
+Do not begin Phase 10 until the user explicitly approves it.
