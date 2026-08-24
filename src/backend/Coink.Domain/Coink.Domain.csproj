@@ -1,0 +1,6 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <AssemblyName>Coink.Domain</AssemblyName>
+    <RootNamespace>Coink.Domain</RootNamespace>
+  </PropertyGroup>
+</Project>
