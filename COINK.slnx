@@ -3,4 +3,6 @@
   <Project Path="src/backend/Coink.Application/Coink.Application.csproj" />
   <Project Path="src/backend/Coink.Domain/Coink.Domain.csproj" />
   <Project Path="src/backend/Coink.Infrastructure/Coink.Infrastructure.csproj" />
+  <Project Path="tests/Coink.IntegrationTests/Coink.IntegrationTests.csproj" />
+  <Project Path="tests/Coink.UnitTests/Coink.UnitTests.csproj" />
 </Solution>

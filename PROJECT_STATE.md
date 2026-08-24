@@ -1,12 +1,12 @@
 # Project State
 
 - Current branch: `develop`
-- Last completed phase: Phase 7 - containerized complete local stack
-- Current status: awaiting explicit approval for Phase 8
-- Next phase: automated backend, frontend, integration, and browser tests
+- Last completed phase: Phase 8 - automated test pyramid
+- Current status: awaiting explicit approval for Phase 9
+- Next phase: CI/CD quality validation
 - Assessment source: the supplied PDF/Markdown confirms the registration, relational geography, Stored Procedure, error-handling, Docker, and OpenAPI requirements
 - Data source: fixed 1,119-row DIVIPOLA snapshot supplied as `subregiones.pdf`; provenance, checksum, deterministic generation, and catalog-version caveat are documented in `database/seed/README.md`
-- Environment limitation: the in-app browser was unavailable for visual interaction testing; production build and real HTTP render/CRUD smoke checks pass
+- Environment note: the in-app browser remains unavailable, but Playwright-managed Chromium now passes the complete reviewer journeys headlessly
 - Toolchain caveat: ESLint 9 is pinned because the current Next.js React plugins fail at runtime on ESLint 10; npm flags ESLint 9 as upstream end-of-support, while the final audit remains clean
 
 ## Completed phases
@@ -19,6 +19,7 @@
 - Phase 5: validated registration and complete user CRUD, bounded pagination/search, stable Problem Details, and correct empty-page metadata
 - Phase 6: responsive Next.js user directory with search/pagination, create/detail/edit/delete journeys, dependent Colombia selectors, accessible states, and layered API clients
 - Phase 7: digest-pinned multi-stage images, non-root API/web runtimes, deterministic database initialization, health-gated Compose startup, local-only ports, and explicit persistent/reset workflows
+- Phase 8: backend unit tests, real-PostgreSQL API/database integration tests, frontend unit/component tests, and Playwright reviewer journeys
 
 ## Phase 2 validation evidence
 
@@ -74,6 +75,15 @@
 - A normal `docker compose down` and subsequent startup preserve user data; the separately documented `--volumes` reset recreates the catalog from scratch.
 - Validation used alternate loopback ports to preserve unrelated running containers; the temporary COINK containers, network, volume, and test user were removed afterward.
 
+## Phase 8 validation evidence
+
+- The solution builds with zero warnings/errors and runs 8 backend unit tests covering application validation, persistence outcome mapping, missing resources, and geography service semantics.
+- Eight integration tests start a digest-pinned PostgreSQL 16 container, execute the canonical repository initializer, and cover the complete catalog, CRUD, hierarchy enforcement, constraints, deterministic pagination/search, missing resources, the explicit absence of a duplicate-phone conflict rule, and transaction rollback.
+- Six Vitest tests cover Zod boundaries, list empty/search/pagination behavior, dependent geographic loading, registration submission, and safe client errors.
+- Three Playwright Chromium journeys cover validation and dependent selectors, complete create/view/edit/search/delete behavior, deterministic pagination/filtering, and loading/error feedback.
+- Deterministic `npm ci`, strict frontend/E2E type checking, ESLint, Prettier, Next.js production build, .NET formatting, and package audits pass.
+- The E2E stack used alternate loopback web/PostgreSQL ports; its containers, network, database volume, browser test users, and Testcontainers resources were removed after validation.
+
 ## Approval boundary
 
-Do not begin Phase 8 until the user explicitly approves it.
+Do not begin Phase 9 until the user explicitly approves it.

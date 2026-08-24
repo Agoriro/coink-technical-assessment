@@ -37,5 +37,39 @@ docker compose down --volumes
 docker compose up --build
 ```
 
+## Automated tests
+
+Backend unit tests and real-PostgreSQL integration tests are part of the
+solution. The integration fixture starts an ephemeral PostgreSQL 16 container,
+loads `database/init/001_initialize.sql` in its canonical include order, and
+removes the container after the run:
+
+```powershell
+dotnet restore COINK.slnx
+dotnet build COINK.slnx --no-restore
+dotnet test COINK.slnx --no-build
+```
+
+Run the frontend unit/component suite:
+
+```powershell
+npm.cmd --prefix src/web ci
+npm.cmd --prefix src/web test
+```
+
+Browser E2E tests require the complete stack to be running. With the default
+ports, install the Playwright browser once and execute Chromium headlessly:
+
+```powershell
+npm.cmd --prefix tests/e2e ci
+npx.cmd --prefix tests/e2e playwright install --with-deps chromium
+npx.cmd --prefix tests/e2e playwright test --config tests/e2e/playwright.config.ts
+```
+
+Set `E2E_BASE_URL` and `E2E_API_BASE_URL` when Compose uses non-default web or
+API ports. Playwright uses one worker for deterministic shared-database flows
+and keeps traces, screenshots, and videos only as configured for failure
+diagnosis; generated reports are ignored by Git.
+
 Expanded architecture, API, testing, troubleshooting, decision, and compliance
 documentation will be consolidated in the final documentation phase.
