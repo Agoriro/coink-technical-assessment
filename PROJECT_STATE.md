@@ -1,9 +1,9 @@
 # Project State
 
 - Current branch: `develop`
-- Last completed phase: Phase 6 - Next.js user-management interface
-- Current status: awaiting explicit approval for Phase 7
-- Next phase: Dockerfiles and complete Docker Compose workflow
+- Last completed phase: Phase 7 - containerized complete local stack
+- Current status: awaiting explicit approval for Phase 8
+- Next phase: automated backend, frontend, integration, and browser tests
 - Assessment source: the supplied PDF/Markdown confirms the registration, relational geography, Stored Procedure, error-handling, Docker, and OpenAPI requirements
 - Data source: fixed 1,119-row DIVIPOLA snapshot supplied as `subregiones.pdf`; provenance, checksum, deterministic generation, and catalog-version caveat are documented in `database/seed/README.md`
 - Environment limitation: the in-app browser was unavailable for visual interaction testing; production build and real HTTP render/CRUD smoke checks pass
@@ -18,6 +18,7 @@
 - Phase 4: versioned country, department, and municipality read endpoints backed exclusively by PostgreSQL Stored Procedures through Dapper/Npgsql
 - Phase 5: validated registration and complete user CRUD, bounded pagination/search, stable Problem Details, and correct empty-page metadata
 - Phase 6: responsive Next.js user directory with search/pagination, create/detail/edit/delete journeys, dependent Colombia selectors, accessible states, and layered API clients
+- Phase 7: digest-pinned multi-stage images, non-root API/web runtimes, deterministic database initialization, health-gated Compose startup, local-only ports, and explicit persistent/reset workflows
 
 ## Phase 2 validation evidence
 
@@ -63,6 +64,16 @@
 - Detail rendering resolves the complete geographic hierarchy; empty, loading, validation, API-error, not-found, and delete-confirmation states are implemented.
 - The isolated PostgreSQL container and its non-persistent test data were removed after checks.
 
+## Phase 7 validation evidence
+
+- `docker compose config --quiet` validates the three-service `web`, `api`, and `postgres` model with environment-supplied credentials.
+- Digest-pinned .NET, Node.js, and PostgreSQL Alpine images build successfully; API and web runtime processes use dedicated non-root users.
+- `docker compose up --build --detach --wait` passes from an empty volume with dependency-gated health checks for all services.
+- Initialization produces 1 country, 33 departments, and 1,119 municipality-level records using the canonical repository scripts.
+- Real containerized HTTP checks cover server-rendered UI data, complete user CRUD, geographic names, configured CORS, and security headers.
+- A normal `docker compose down` and subsequent startup preserve user data; the separately documented `--volumes` reset recreates the catalog from scratch.
+- Validation used alternate loopback ports to preserve unrelated running containers; the temporary COINK containers, network, volume, and test user were removed afterward.
+
 ## Approval boundary
 
-Do not begin Phase 7 until the user explicitly approves it.
+Do not begin Phase 8 until the user explicitly approves it.

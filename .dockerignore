@@ -36,3 +36,5 @@
 
 docs
 tests/e2e
+database
+src/web
