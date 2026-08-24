@@ -1,10 +1,9 @@
 # Project State
 
 - Branch: `develop`
-- Current status: Phase 10 complete; assessment implementation and reviewer
-  handoff are complete
+- Current status: Phase 11 complete; secure one-command local bootstrap added
 - Blockers: none
-- Approval boundary: stop after the Phase 10 commit; do not push or begin new
+- Approval boundary: stop after the Phase 11 commit; do not push or begin new
   scope without explicit user approval
 - Assessment source: supplied PDF/Markdown; requirement classifications are in
   [`docs/compliance/assessment-matrix.md`](docs/compliance/assessment-matrix.md)
@@ -29,6 +28,8 @@
 - Phase 9: GitHub Actions quality gates.
 - Phase 10: final README, Postman assets, ADRs, compliance matrix, and security
   review.
+- Phase 11: secure PowerShell bootstrap that generates ignored local
+  configuration and starts Docker Compose with one command.
 
 ## Final validation evidence
 
@@ -49,7 +50,8 @@
 - Final security review covers secrets, SQL parameters, validation, relational
   integrity, error disclosure, CORS/headers, rate limiting, OpenAPI exposure,
   containers, dependencies, and disclosed scope boundaries.
-- Final phase commit: `docs: complete reviewer handoff` (this phase's commit).
+- Phase 11 commit: `chore(dev): add secure local startup script` (this phase's
+  commit).
 
 ## Commit evidence
 
@@ -63,6 +65,7 @@
 - `0b47f61` — `feat(docker): add complete local stack`
 - `074d48f` — `test: add automated test pyramid`
 - `02c686c` — `ci: add GitHub Actions quality gates`
+- `7bf28c8` — `docs: complete reviewer handoff`
 
 ## Known boundaries
 

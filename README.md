@@ -14,18 +14,27 @@ CI quality gates.
   outside containers.
 - Available loopback ports `3000`, `8080`, and `5432`, or custom ports in `.env`.
 
-Copy [`.env.example`](.env.example) to `.env`, replace
-`replace_with_a_local_password` with a local alphanumeric password, then start
-the complete stack from the repository root:
+Start the complete stack from the repository root with one command using
+[`scripts/start-local.ps1`](scripts/start-local.ps1):
 
 ```powershell
-Copy-Item .env.example .env
-docker compose up --build
+.\scripts\start-local.ps1
 ```
 
-This one Compose command builds and starts `postgres`, `api`, and `web`; waits
-for meaningful dependency health checks; and initializes the database from the
-versioned repository scripts. Startup never downloads reference data.
+On first run, the script creates ignored `.env` from [`.env.example`](.env.example),
+generates a cryptographically random 256-bit hexadecimal database password, and
+never prints it. Later runs reuse that local configuration so the persistent
+PostgreSQL volume remains accessible. The script invokes Docker Compose to build
+and start `postgres`, `api`, and `web`; waits for meaningful dependency health
+checks; and initializes the database from versioned repository scripts. Startup
+never downloads reference data.
+
+Keep the terminal attached for logs with the command above. To return to the
+prompt after all services become healthy:
+
+```powershell
+.\scripts\start-local.ps1 -Detach
+```
 
 | Service    | Default local URL               | Purpose                               |
 | ---------- | ------------------------------- | ------------------------------------- |
@@ -46,7 +55,8 @@ docker compose down
 ## Configuration
 
 Do not commit `.env`; it is ignored by Git. Repository examples contain no real
-secrets.
+secrets. For manual startup or custom ports, copy `.env.example` to `.env`,
+replace its password placeholder, then run `docker compose up --build`.
 
 | Variable                      | Default/example         | Consumer       | Meaning                                      |
 | ----------------------------- | ----------------------- | -------------- | -------------------------------------------- |
@@ -213,8 +223,9 @@ outside current scope.
 
 ## Troubleshooting
 
-- **Compose says `POSTGRES_PASSWORD` is missing:** create `.env` from
-  `.env.example` and replace the placeholder.
+- **Compose says `POSTGRES_PASSWORD` is missing:** run
+  `.\scripts\start-local.ps1`, or create `.env` manually from `.env.example` and
+  replace the placeholder.
 - **A default port is busy:** set unused `POSTGRES_PORT`, `API_PORT`, and
   `WEB_PORT` values in `.env`, rebuild, and use matching URLs.
 - **API waits or reports database connection errors:** inspect
