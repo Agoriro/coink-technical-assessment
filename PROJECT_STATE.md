@@ -1,12 +1,13 @@
 # Project State
 
 - Current branch: `develop`
-- Last completed phase: Phase 5 - user registration and complete user CRUD API
-- Current status: awaiting explicit approval for Phase 6
-- Next phase: Next.js user-management interface
+- Last completed phase: Phase 6 - Next.js user-management interface
+- Current status: awaiting explicit approval for Phase 7
+- Next phase: Dockerfiles and complete Docker Compose workflow
 - Assessment source: the supplied PDF/Markdown confirms the registration, relational geography, Stored Procedure, error-handling, Docker, and OpenAPI requirements
 - Data source: fixed 1,119-row DIVIPOLA snapshot supplied as `subregiones.pdf`; provenance, checksum, deterministic generation, and catalog-version caveat are documented in `database/seed/README.md`
-- Environment limitation: none for the completed phases; Docker-backed PostgreSQL and local .NET runtime checks pass
+- Environment limitation: the in-app browser was unavailable for visual interaction testing; production build and real HTTP render/CRUD smoke checks pass
+- Toolchain caveat: ESLint 9 is pinned because the current Next.js React plugins fail at runtime on ESLint 10; npm flags ESLint 9 as upstream end-of-support, while the final audit remains clean
 
 ## Completed phases
 
@@ -16,6 +17,7 @@
 - Phase 3: layered .NET projects, dependency composition, centralized Problem Details, exception handling, CORS, rate limiting, security headers, request-size limits, and development-only OpenAPI
 - Phase 4: versioned country, department, and municipality read endpoints backed exclusively by PostgreSQL Stored Procedures through Dapper/Npgsql
 - Phase 5: validated registration and complete user CRUD, bounded pagination/search, stable Problem Details, and correct empty-page metadata
+- Phase 6: responsive Next.js user directory with search/pagination, create/detail/edit/delete journeys, dependent Colombia selectors, accessible states, and layered API clients
 
 ## Phase 2 validation evidence
 
@@ -52,6 +54,15 @@
 - Missing get/update/delete operations return safe `404` Problem Details; OpenAPI contains all five user CRUD operations alongside the three geography operations.
 - The isolated PostgreSQL validation container and its non-persistent test data were removed after checks.
 
+## Phase 6 validation evidence
+
+- Deterministic `npm ci` dependencies are pinned in `package-lock.json`; `npm audit` reports zero known vulnerabilities.
+- Prettier verification, ESLint with zero warnings, strict TypeScript checking, and the optimized Next.js production build pass.
+- Real runtime checks use PostgreSQL 16 initialized from repository scripts and the actual ASP.NET Core API.
+- Server-rendered list, create, detail, and edit routes return their expected content; API-backed create, update, and delete complete successfully.
+- Detail rendering resolves the complete geographic hierarchy; empty, loading, validation, API-error, not-found, and delete-confirmation states are implemented.
+- The isolated PostgreSQL container and its non-persistent test data were removed after checks.
+
 ## Approval boundary
 
-Do not begin Phase 6 until the user explicitly approves it.
+Do not begin Phase 7 until the user explicitly approves it.
